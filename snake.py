@@ -272,9 +272,12 @@ class Game:
 					if (x >= fx - 10 and x <= fx + 10 ) and (y >= fy -10 and y <= fy+10):
 						foodList.remove([fx,fy])
 						if MULTIPLE_FOODS:
-							foodAmount = random.randint(0,3)
+							foodAmount = random.randint(1,3)
+							if len(foodList) > 2:
+								foodAmount = 0
 						else:
 							foodAmount = 1
+
 						for i in range(foodAmount):
 							fx = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
 							fy = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
