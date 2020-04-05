@@ -189,12 +189,14 @@ class Game:
 		snakeLength = 1
 		xPos = 0
 		yPos = 0
+		foodAmount = 1
+		foodList = []
 		foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
 		foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
+		foodList.append([foodX,foodY])
 		snakeList.append([x,y])
 		global INVISIBLE_WALLS
 		global MULTIPLE_FOODS
-		
 		while not gameQuit:
 			self.game_screen.fill(BLACK_COLOR)
 			score(snakeLength -1, self.game_screen)
@@ -233,7 +235,8 @@ class Game:
 
 				self.game_screen.fill(BLACK_COLOR)
 				
-				pygame.draw.rect(self.game_screen, RED_COLOR, [foodX, foodY, snakeWidth, snakeWidth])
+				for fx, fy in foodList:
+					pygame.draw.rect(self.game_screen, RED_COLOR, [fx, fy, snakeWidth, snakeWidth])
 				score(snakeLength - 1, self.game_screen)
 
 				x += xPos * snakeSpeed
@@ -253,7 +256,6 @@ class Game:
 				if INVISIBLE_WALLS:
 					if x <= 0:
 						x = SCREEN_WIDTH
-					
 					elif y <= 0:
 						y = SCREEN_HEIGHT
 					elif x >= SCREEN_WIDTH:
@@ -266,12 +268,18 @@ class Game:
 
 				snake(snakeList, snakeWidth, self.game_screen)
 				
-
-				if (x >= foodX - 10 and x <= foodX + 10 ) and (y >= foodY -10 and y <= foodY+10):
-					foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
-					foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
-					snakeLength += 1
-				
+				for fx, fy in foodList:
+					if (x >= fx - 10 and x <= fx + 10 ) and (y >= fy -10 and y <= fy+10):
+						foodList.remove([fx,fy])
+						if MULTIPLE_FOODS:
+							foodAmount = random.randint(0,3)
+						else:
+							foodAmount = 1
+						for i in range(foodAmount):
+							fx = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
+							fy = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
+							foodList.append([fx,fy])
+						snakeLength += 1
 				clock.tick(TICK_RATE)		
 				#pygame.display.update()
 
