@@ -14,6 +14,8 @@ FONT = pygame.font.SysFont('comicsans', 75)
 LEVEL_FONT = pygame.font.SysFont('comicsans', 40)
 BUTTON_FONT = pygame.font.SysFont('comicsans', 20)
 TICK_RATE = 30
+MULTIPLE_FOODS = False
+INVISIBLE_WALLS = False
 
 def snake(snake, width, background):
 	for x,y in snake:
@@ -55,6 +57,7 @@ class Menu:
 		buttonSizeX = 100
 		buttonSizeY = 50
 		mouse = [0,0]
+
 		while menuActive:
 			for event in pygame.event.get():
 				#print(event)
@@ -66,9 +69,8 @@ class Menu:
 			self.game_screen.fill(BLACK_COLOR)
 
 			pygame.draw.rect(self.game_screen, WHITE_COLOR, (startButtonX, startButtonY, buttonSizeX, buttonSizeY))
-			pygame.draw.rect(self.game_screen, WHITE_COLOR, (optionButtonX, optionButtonY, 100, buttonSizeY))
-			pygame.draw.rect(self.game_screen, WHITE_COLOR, (endButtonX, endButtonY, 100, buttonSizeY))
-			screen_rect = self.game_screen.get_rect()
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (optionButtonX, optionButtonY, buttonSizeX, buttonSizeY))
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (endButtonX, endButtonY, buttonSizeX, buttonSizeY))
 			
 			textSurf, textRect = text_objects("Start Game", BUTTON_FONT, BLACK_COLOR)
 			textRect.center = ( (startButtonX+(buttonSizeX/2)), (startButtonY+(buttonSizeY/2)) )
@@ -86,11 +88,81 @@ class Menu:
 				new_game = Game(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).run_game_loop()
 				menu = Menu(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).showMenu()
 			elif optionButtonX+buttonSizeX > mouse[0] > buttonSizeX and optionButtonY+buttonSizeY > mouse[1] > buttonSizeY:
-				pygame.draw.rect(self.game_screen, GREEN_COLOR,(optionButtonX,optionButtonY,buttonSizeX,buttonSizeY))
+				pygame.display.quit()
+				menu = Menu('Options',SCREEN_WIDTH,SCREEN_HEIGHT).optionsMenu()
+
 			elif endButtonX+buttonSizeX > mouse[0] > buttonSizeX and endButtonY+buttonSizeY > mouse[1] > buttonSizeY:
 				pygame.quit()
 				quit()
 
+			pygame.display.update()
+			clock.tick(TICK_RATE)
+
+	def optionsMenu(self):
+		optionsActive = True
+		option1ButtonX = 150
+		option1ButtonY = 50
+		option2ButtonX = 150
+		option2ButtonY = 150
+		backButtonX = 150
+		backButtonY = 250
+		buttonSizeX = 150
+		buttonSizeY = 50
+		mouse = [0,0]
+		global INVISIBLE_WALLS
+		global MULTIPLE_FOODS
+
+		while optionsActive:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					quit()
+				if event.type == pygame.MOUSEBUTTONUP:
+					mouse = pygame.mouse.get_pos()
+			self.game_screen.fill(BLACK_COLOR)
+
+			if INVISIBLE_WALLS:
+				pygame.draw.rect(self.game_screen, GREEN_COLOR, (option1ButtonX, option1ButtonY, buttonSizeX, buttonSizeY))
+			else:
+				pygame.draw.rect(self.game_screen, RED_COLOR, (option1ButtonX, option1ButtonY, buttonSizeX, buttonSizeY))
+			
+			if MULTIPLE_FOODS:
+				pygame.draw.rect(self.game_screen, GREEN_COLOR, (option2ButtonX, option2ButtonY, buttonSizeX, buttonSizeY))
+			else:
+				pygame.draw.rect(self.game_screen, RED_COLOR, (option2ButtonX, option2ButtonY, buttonSizeX, buttonSizeY))
+			
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (backButtonX, backButtonY, buttonSizeX, buttonSizeY))
+
+			textSurf, textRect = text_objects("Invisible Walls", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (option1ButtonX+(buttonSizeX/2)), (option1ButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+			
+			textSurf, textRect = text_objects("Multiple Food Items", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (option2ButtonX+(buttonSizeX/2)), (option2ButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+
+			textSurf, textRect = text_objects("Back To Main Menu", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (backButtonX+(buttonSizeX/2)), (backButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+
+			if option1ButtonX+buttonSizeX > mouse[0] > buttonSizeX and option1ButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				if INVISIBLE_WALLS:
+					INVISIBLE_WALLS = False
+				else:
+					INVISIBLE_WALLS = True
+				
+
+			elif option2ButtonX+buttonSizeX > mouse[0] > buttonSizeX and option2ButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				if MULTIPLE_FOODS:
+					MULTIPLE_FOODS = False
+				else:
+					MULTIPLE_FOODS = True
+
+			elif backButtonX+buttonSizeX > mouse[0] > buttonSizeX and backButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				pygame.display.quit()
+				menu = Menu(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).showMenu()
+			
+			mouse = [0,0]
 			pygame.display.update()
 			clock.tick(TICK_RATE)
 
@@ -120,6 +192,8 @@ class Game:
 		foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
 		foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
 		snakeList.append([x,y])
+		global INVISIBLE_WALLS
+		global MULTIPLE_FOODS
 		
 		while not gameQuit:
 			self.game_screen.fill(BLACK_COLOR)
