@@ -250,8 +250,19 @@ class Game:
 					if snakeHead == item:
 						is_game_over = True
 
-				if x <= 0 or y <= 0 or x >= SCREEN_WIDTH or y >= SCREEN_HEIGHT:
-					is_game_over = True
+				if INVISIBLE_WALLS:
+					if x <= 0:
+						x = SCREEN_WIDTH
+					
+					elif y <= 0:
+						y = SCREEN_HEIGHT
+					elif x >= SCREEN_WIDTH:
+						x = 0
+					elif y >= SCREEN_HEIGHT:
+						y = 0
+				else:
+					if x <= 0 or y <= 0 or x >= SCREEN_WIDTH or y >= SCREEN_HEIGHT:
+						is_game_over = True
 
 				snake(snakeList, snakeWidth, self.game_screen)
 				
