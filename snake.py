@@ -11,7 +11,9 @@ clock = pygame.time.Clock()
 GAME_TITLE = "Snake Game"
 pygame.font.init()
 FONT = pygame.font.SysFont('comicsans', 75)
-LEVEL_FONT = pygame.font.SysFont('comicsans', 30)
+LEVEL_FONT = pygame.font.SysFont('comicsans', 40)
+BUTTON_FONT = pygame.font.SysFont('comicsans', 20)
+TICK_RATE = 30
 
 def snake(snake, width, background):
 	for x,y in snake:
@@ -28,10 +30,71 @@ def replayMenu(background):
 	background.blit(value, [20, 60])
 	pygame.display.flip()
 
-class Game:
-	
-	TICK_RATE = 30
-	
+def text_objects(text, font, color):
+	textSurface = font.render(text, True, color)
+	return textSurface, textSurface.get_rect()
+
+class Menu:
+	def __init__(self,title,width, height):
+		self.title = title
+		self.width = width
+		self.height = height
+
+		self.game_screen = pygame.display.set_mode((width,height))
+		self.game_screen.fill(BLACK_COLOR)
+		pygame.display.set_caption(title)
+
+	def showMenu(self):
+		menuActive = True
+		startButtonX = 150
+		startButtonY = 50
+		optionButtonX = 150
+		optionButtonY = 150
+		endButtonX = 150
+		endButtonY = 250
+		buttonSizeX = 100
+		buttonSizeY = 50
+		mouse = [0,0]
+		while menuActive:
+			for event in pygame.event.get():
+				#print(event)
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					quit()
+				if event.type == pygame.MOUSEBUTTONUP:
+					mouse = pygame.mouse.get_pos()
+			self.game_screen.fill(BLACK_COLOR)
+
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (startButtonX, startButtonY, buttonSizeX, buttonSizeY))
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (optionButtonX, optionButtonY, 100, buttonSizeY))
+			pygame.draw.rect(self.game_screen, WHITE_COLOR, (endButtonX, endButtonY, 100, buttonSizeY))
+			screen_rect = self.game_screen.get_rect()
+			
+			textSurf, textRect = text_objects("Start Game", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (startButtonX+(buttonSizeX/2)), (startButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+			
+			textSurf, textRect = text_objects("Options", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (optionButtonX+(buttonSizeX/2)), (optionButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+
+			textSurf, textRect = text_objects("Close Game", BUTTON_FONT, BLACK_COLOR)
+			textRect.center = ( (endButtonX+(buttonSizeX/2)), (endButtonY+(buttonSizeY/2)) )
+			self.game_screen.blit(textSurf, textRect)
+			
+			if startButtonX+buttonSizeX > mouse[0] > buttonSizeX and startButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				new_game = Game(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).run_game_loop()
+				menu = Menu(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).showMenu()
+			elif optionButtonX+buttonSizeX > mouse[0] > buttonSizeX and optionButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				pygame.draw.rect(self.game_screen, GREEN_COLOR,(optionButtonX,optionButtonY,buttonSizeX,buttonSizeY))
+			elif endButtonX+buttonSizeX > mouse[0] > buttonSizeX and endButtonY+buttonSizeY > mouse[1] > buttonSizeY:
+				pygame.quit()
+				quit()
+
+			pygame.display.update()
+			clock.tick(TICK_RATE)
+
+class Game:	
 	def __init__(self,title,width, height):
 		self.title = title
 		self.width = width
@@ -57,7 +120,6 @@ class Game:
 		foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
 		foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
 		snakeList.append([x,y])
-		#score(snakeLength - 1, self.game_screen)
 		
 		while not gameQuit:
 			self.game_screen.fill(BLACK_COLOR)
@@ -71,7 +133,8 @@ class Game:
 						if event.key == pygame.K_r:
 							is_game_over = False
 							new_game = Game(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).run_game_loop()
-			clock.tick(self.TICK_RATE)
+			clock.tick(TICK_RATE)
+			
 			while not is_game_over:
 				for event in pygame.event.get():
 					if event.type == pygame.QUIT:
@@ -124,12 +187,13 @@ class Game:
 					foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
 					snakeLength += 1
 				
-				clock.tick(self.TICK_RATE)		
+				clock.tick(TICK_RATE)		
 				#pygame.display.update()
 
 pygame.init()
 
-new_game = Game(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).run_game_loop()
+menu = Menu(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).showMenu()
+#new_game = Game(GAME_TITLE,SCREEN_WIDTH,SCREEN_HEIGHT).run_game_loop()
 
-pygame.quit()
-quit()
+#pygame.quit()
+#quit()
