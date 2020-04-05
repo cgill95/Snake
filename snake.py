@@ -5,12 +5,24 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800
 WHITE_COLOR = (255,255,255)
 RED_COLOR = (255,0,0)
+GREEN_COLOR = (0, 255, 0)
 BLACK_COLOR = (0,0,0)
 clock = pygame.time.Clock()
 GAME_TITLE = "Snake Game"
 pygame.font.init()
 FONT = pygame.font.SysFont('comicsans', 75)
-LEVEL_FONT = pygame.font.SysFont('comicsans', 50)
+LEVEL_FONT = pygame.font.SysFont('comicsans', 30)
+
+def snake(snake, width, background):
+	for x,y in snake:
+		pygame.draw.rect(background, WHITE_COLOR, [x, y, width, width])
+	pygame.display.flip()
+
+def score(points,background):
+	value = LEVEL_FONT.render("Current Score: " + str(points), True, GREEN_COLOR)
+	background.blit(value, [20, 20])
+	pygame.display.flip()
+
 
 class Game:
 	
@@ -41,7 +53,7 @@ class Game:
 		foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
 		foodY = random.randint(0, SCREEN_HEIGHT- snakeWidth) // 10 * 10
 		snakeList.append([x,y])
-
+		score(snakeLength - 1, self.game_screen)
 		while not is_game_over:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
@@ -86,6 +98,7 @@ class Game:
 				is_game_over = True
 
 			snake(snakeList, snakeWidth, self.game_screen)
+			score(snakeLength - 1, self.game_screen)
 
 			if (x >= foodX - 10 and x <= foodX + 10 ) and (y >= foodY -10 and y <= foodY+10):
 				foodX = random.randint(0, SCREEN_WIDTH - snakeWidth) // 10 * 10
@@ -95,10 +108,8 @@ class Game:
 			clock.tick(self.TICK_RATE)		
 			pygame.display.update()
 						
-def snake(snake, width, background):
-	for x,y in snake:
-		pygame.draw.rect(background, WHITE_COLOR, [x, y, width, width])
-	pygame.display.flip()
+
+
 
 pygame.init()
 
